@@ -2,6 +2,7 @@ pipeline {
     agent any
 
     environment {
+        DOCKER_HUB_USERNAME = 'abhimanyu1234' // <-- change this to your Docker Hub username
         IMAGE_NAME = 'nodejsdocker1'
         IMAGE_TAG = 'latest'
         TF_WORKING_DIR = '.'
@@ -25,14 +26,22 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 dir('blogWebsite-main') {
-                    bat "docker build -t %IMAGE_NAME%:%IMAGE_TAG% ."
+                    bat "docker build -t %DOCKER_HUB_USERNAME%/%IMAGE_NAME%:%IMAGE_TAG% ."
                 }
             }
         }
 
-        stage('Push Docker Image Locally') {
+        stage('Docker Hub Login') {
             steps {
-                echo 'Docker image built and available locally. No push to ACR.'
+                withCredentials([usernamePassword(credentialsId: 'docker-hub-credentials', usernameVariable: 'DOCKERHUB_USER', passwordVariable: 'DOCKERHUB_PASS')]) {
+                    bat "echo %DOCKERHUB_PASS% | docker login -u %DOCKERHUB_USER% --password-stdin"
+                }
+            }
+        }
+
+        stage('Push Docker Image to Docker Hub') {
+            steps {
+                bat "docker push %DOCKER_HUB_USERNAME%/%IMAGE_NAME%:%IMAGE_TAG%"
             }
         }
     }
