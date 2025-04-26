@@ -15,7 +15,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/Abhimanyu2811/JenkinsWithNodejsblog.git'
+                git branch: 'main', url: 'https://github.com/Abhimanyu2811/blogWebsite1.git'
             }
         }
         stage('Install Node.js Dependencies') {
